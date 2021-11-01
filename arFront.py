@@ -2,6 +2,10 @@ import pygame
 from time import time
 
 #Utils functions:
+def getPx(percents, resolution):
+    place = [int(percents[0]*resolution[0]), int(percents[1]*resolution[1])]
+    return place
+
 def hasColision(area1, area2):
     area1ponto1 = area1[0]
     area1ponto2 = [area1[1][0], area1[0][1]]
@@ -52,7 +56,7 @@ class App:
         self.fps = 0
         self.FPS = None
         self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode(self.resolucao)
+        self.screen = pygame.display.set_mode(self.resolucao, flags=pygame.RESIZABLE)
         self.mouse = Mouse()
 
         #Lista de draws
@@ -78,8 +82,14 @@ class App:
 
         #Texto FPS
         self.txFps = self.novoTexto(string='FPS: None')
-        self.txFps.lugar = [self.resolucao[0]*0.02, self.resolucao[1]*0.02]
+        self.txFps.lugar = [0.01, 0.01]
         self.txFps.active = False
+
+        #Marca dagua ARTI
+        self.txARTI = self.novoTexto(string='powered by ARTI.Tecnology')
+        self.txARTI.lugar = [0.01, 0.95]
+        self.txARTI.cor = self.cor_back_secundaria
+        self.txARTI.active = False
     
     def setTema(self, tema):
         self.cor_back = tema['cor_back']
@@ -89,7 +99,7 @@ class App:
         self.cor_texto_bt = tema['cor_texto_bt'],
         self.bt_radius = tema['bt_radius']
     
-    def novoSquare(self, lugar=[0,0], cor=None, tamanho=[50,50], active=True, command=None, radius=None, bordas=0, end_draw=False):
+    def novoSquare(self, lugar=[0,0], cor=None, tamanho=[0.05,0.05], active=True, command=None, radius=None, bordas=0, end_draw=False):
         
         if not cor: cor = self.cor_bt
         if not radius: radius = self.bt_radius
@@ -98,7 +108,7 @@ class App:
         self.listSquares.append(square)
         return square
 
-    def novoBotao(self, lugar=[0,0], cor=None , tamanho=[80,50], active=True, command=None, string='Novo botão', corTexto=None, tamanhoTexto=None, fonteTexto=None, radius=None, bordas=0, end_draw=False):
+    def novoBotao(self, lugar=[0,0], cor=None , tamanho=[0.1,0.055], active=True, command=None, string='Novo botão', corTexto=None, tamanhoTexto=None, fonteTexto=None, radius=None, bordas=0, end_draw=False):
 
         if not cor: cor = self.cor_bt
         if not corTexto: corTexto = self.cor_texto_bt
@@ -123,7 +133,7 @@ class App:
         self.listTextos.append(texto)
         return texto
     
-    def drawSquare(self, cor=(255,255,255), lugar=[0,0], tamanho=[20,20], radius=0, bordas=0, end_draw=False):
+    def drawSquare(self, cor=(255,255,255), lugar=[0,0], tamanho=[40,40], radius=0, bordas=0, end_draw=False):
         pos = -1
         if end_draw: pos = 0
         self.draws.insert(pos, ("square", cor, lugar, tamanho, radius, bordas))
@@ -150,7 +160,7 @@ class App:
                 areaClique = pygame.mouse.get_pos()
 
                 for botao in self.listBotoes:
-                    if hasColision(botao.getArea(), self.mouse.getArea(areaClique)):
+                    if hasColision(botao.getArea(self.screen.get_size()), self.mouse.getArea(areaClique)):
                         try:
                             return botao.command()
                         except:
@@ -160,7 +170,9 @@ class App:
         
         for square in self.listSquares:
             if square.active:
-                self.drawSquare(square.cor, square.lugar, square.tamanho, square.radius, square.bordas, square.end_draw)
+                lugar_square = getPx(square.lugar, self.screen.get_size())
+                tamanho_square = getPx(square.tamanho, self.screen.get_size())
+                self.drawSquare(square.cor, lugar_square, tamanho_square, square.radius, square.bordas, square.end_draw)
         
         for botao in self.listBotoes:
             if botao.active:
@@ -168,19 +180,25 @@ class App:
 
                 tamanho_surfice = textsurface.get_size()
 
-                lugar_texto = [int((botao.lugar[0]+(botao.tamanho[0]/2))-tamanho_surfice[0]*0.55), int((botao.lugar[1]+(botao.tamanho[1]/2))-tamanho_surfice[1])]
+                lugar_botao = getPx(botao.lugar, self.screen.get_size())
+                tamanho_botao = getPx(botao.tamanho, self.screen.get_size())
 
-                self.drawSquare(botao.cor, botao.lugar, botao.tamanho, botao.radius, botao.bordas, botao.end_draw)
+                lugar_texto = [int((lugar_botao[0]+(tamanho_botao[0]/2))-tamanho_surfice[0]*0.55), int((lugar_botao[1]+(tamanho_botao[1]/2))-tamanho_surfice[1])]
+
+                self.drawSquare(botao.cor, lugar_botao, tamanho_botao, botao.radius, botao.bordas, botao.end_draw)
                 self.drawText(botao.string, cor=botao.corTexto, lugar=lugar_texto, tamanho=botao.tamanhoTexto, fonte=botao.fonteTexto)
         
         for menu in self.listMenus:
             if menu.active:
                 if menu.aberto:
-                    self.drawSquare(menu.cor, menu.lugar, menu.tamanho)
+                    lugar_menu = getPx(menu.lugar, self.screen.get_size())
+                    tamanho_menu = getPx(botao.tamanho, self.screen.get_size())
+                    self.drawSquare(menu.cor, lugar_menu, tamanho_menu)
         
         for texto in self.listTextos:
             if texto.active:
-                self.drawText(texto.string, texto.cor, texto.lugar, texto.tamanho, texto.fonte)
+                lugar_texto = getPx(texto.lugar, self.screen.get_size())
+                self.drawText(texto.string, texto.cor, lugar_texto, texto.tamanho, texto.fonte)
         
         if self.FPS:
             self.txFps.string = f'FPS: {self.FPS}'
@@ -248,10 +266,12 @@ class Square(object):
         self.radius = radius
         self.bordas = bordas
     
-    def getArea(self):
+    def getArea(self, resolution):
+        lugar = getPx(self.lugar, resolution)
+        tamanho = getPx(self.tamanho, resolution)
         return [
-            [self.lugar[0], self.lugar[1]],
-            [self.lugar[0] + self.tamanho[0], self.lugar[1] + self.tamanho[1]]
+            [lugar[0], lugar[1]],
+            [lugar[0] + tamanho[0], lugar[1] + tamanho[1]]
         ]
 
 class Botao(Square):
@@ -289,7 +309,7 @@ if __name__ == '__main__':
         print('finish')
 
     bt1 = arApp.novoBotao()
-    bt1.lugar = [200, 200]
+    bt1.lugar = [0.5, 0.5]
     bt1.command = funcaoBotao
     #bt1.cor = (arApp.corTextoSecundaria)
     #bt1.tamanho = [80,45]
@@ -299,14 +319,14 @@ if __name__ == '__main__':
 
     btSair = arApp.novoBotao()
     btSair.string = 'x'
-    btSair.lugar = [arApp.resolucao[0]*0.93, arApp.resolucao[1]*0.02]
-    btSair.tamanho = [40,40]
+    btSair.lugar = [0.925, 0.025]
+    btSair.tamanho = [0.05, 0.07]
     btSair.corTexto = (255,0,0)
     btSair.tamanhoTexto = 30
     btSair.command = sair
 
     txMouse = arApp.novoTexto()
-    txMouse.lugar = [10, 200]
+    txMouse.lugar = [0.025, 0.025]
 
     #menu1 = arApp.novoMenu()
     #menu1.tamanho = [int(arApp.resolucao[0]*0.25), arApp.resolucao[1]]
@@ -322,8 +342,8 @@ if __name__ == '__main__':
         #arApp.drawLine(ponto1=[100,100], ponto2=[350,350], cor=(0,255,0))
 
         txMouse.string = str(pygame.mouse.get_pos())
-
+        
         saida = arApp.update()
-
+        
         if saida == 'finish':
             running = False
