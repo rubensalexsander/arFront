@@ -231,10 +231,25 @@ class App:
         #Adiciona botões à lista de escrita
         for botao in self.listBotoes:
             if botao.active:
-                lugar_botao = get_px(botao.lugar, self.screen.get_size())
+                def get_lugar_texto(lugar_botao, tamanho_botao, refer_botao):
+                    if refer_botao == 'nl':
+                        return [int(lugar_botao[0]+(tamanho_botao[0]/2)), int(lugar_botao[1]+(tamanho_botao[1]/2))]
+                    elif refer_botao == 'nr':
+                        return [int(lugar_botao[0]-(tamanho_botao[0]/2)), int(lugar_botao[1]+(tamanho_botao[1]/2))]
+                    elif refer_botao == 'sl':
+                        return [int(lugar_botao[0]+(tamanho_botao[0]/2)), int(lugar_botao[1]-(tamanho_botao[1]/2))]
+                    elif refer_botao == 'sr':
+                        return [int(lugar_botao[0]-(tamanho_botao[0]/2)), int(lugar_botao[1]-(tamanho_botao[1]/2))]
+                    else:
+                        return lugar_botao
+
+                tamanho_screen = self.screen.get_size()
+                lugar_botao = get_px(botao.lugar, tamanho_screen)
+                tamanho_botao = get_px(botao.tamanho, tamanho_screen)
+                lugar_texto = get_lugar_texto(lugar_botao, tamanho_botao, botao.refer)
 
                 self.drawSquare(cor=botao.cor, lugar=botao.lugar, refer=botao.refer, tamanho=botao.tamanho, radius=botao.radius, bordas=botao.bordas, corBordas=botao.corBordas, end_draw=botao.end_draw)
-                self.drawText(botao.string, cor=botao.corTexto, lugar=lugar_botao, tamanho=botao.tamanhoTexto, fonte=botao.fonteTexto, refer=botao.refer)
+                self.drawText(botao.string, cor=botao.corTexto, lugar=lugar_texto, tamanho=botao.tamanhoTexto, fonte=botao.fonteTexto, refer='c')
         
         for menu in self.listMenus:
             if menu.active:
