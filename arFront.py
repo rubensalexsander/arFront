@@ -1,3 +1,4 @@
+from sys import api_version
 import pygame
 from time import time
 
@@ -113,7 +114,7 @@ class App:
 
         #Definições-------
         if self.FPS_rate == None:
-            self.FPS_rate = 30
+            self.FPS_rate = 60
             
         pygame.init()
         pygame.display.set_caption(nomeJanela)
@@ -412,6 +413,14 @@ if __name__ == '__main__':
         tamanho=[0.5, 0.5]
     )
     sq1.active = False
+
+    tx_arFront = arApp.novoTexto(
+        [0.5, 0.1],
+        cor=(155,155,155),
+        refer='c',
+        tamanho=60,
+        string='arFront'
+    )
 
     running = True
     while running:
