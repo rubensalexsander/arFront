@@ -26,11 +26,9 @@ def get_px(vals, resolution):
 def has_colision(area1, area2):
     area1ponto1 = area1[0]
     area1ponto2 = [area1[1][0], area1[0][1]]
-    area1ponto3 = [area1[0][0], area1[1][1]]
     area1ponto4 = area1[1]
     area2ponto1 = area2[0]
     area2ponto2 = [area2[1][0], area2[0][1]]
-    area2ponto3 = [area2[0][0], area2[1][1]]
     area2ponto4 = area2[1]
     if (area2ponto1[0]>=area1ponto1[0]) and (area2ponto1[1]>=area1ponto1[1]) and (area2ponto1[0]<=area1ponto4[0]) and (area2ponto1[1]<=area1ponto4[1]):
         return True
@@ -41,19 +39,12 @@ def has_colision(area1, area2):
     elif (area2ponto2[0]>=area1ponto1[0]) and (area2ponto2[1]>=area1ponto1[1]) and (area2ponto2[0]<=area1ponto4[0]) and (area2ponto2[1]<=area1ponto4[1]):
         return True
 
-    return False
-
 def refer_adjust(lugar, tamanho, refer):
-    if refer == 'nl':
-        lugar_return = lugar
-    elif refer == 'nr':
-        lugar_return = [int(lugar[0]-tamanho[0]), int(lugar[1])]
-    elif refer == 'sl':
-        lugar_return = [int(lugar[0]), int(lugar[1]-tamanho[1])]
-    elif refer == 'sr':
-        lugar_return = [int(lugar[0]-tamanho[0]), int(lugar[1]-tamanho[1])]
-    elif refer == 'c':
-        lugar_return = [int(lugar[0]-(tamanho[0]/2)), int(lugar[1]-(tamanho[1]/2))]
+    if refer == 'nl': lugar_return = lugar
+    elif refer == 'nr': lugar_return = [int(lugar[0]-tamanho[0]), int(lugar[1])]
+    elif refer == 'sl': lugar_return = [int(lugar[0]), int(lugar[1]-tamanho[1])]
+    elif refer == 'sr': lugar_return = [int(lugar[0]-tamanho[0]), int(lugar[1]-tamanho[1])]
+    elif refer == 'c': lugar_return = [int(lugar[0]-(tamanho[0]/2)), int(lugar[1]-(tamanho[1]/2))]
     
     return lugar_return
 
@@ -127,7 +118,7 @@ class App:
         self.txFps = self.novoTexto(string='FPS: None', lugar=[0.01, 0.01])
         self.txFps.active = False
 
-        #Marca dagua ARTI
+        #Marca d'agua ARTI
         self.txARTI = self.novoTexto(string='powered by ARTI.Tecnology', lugar=[5, 0.975])
         self.txARTI.cor = self.cor_back_secundaria
         self.txARTI.active = True
