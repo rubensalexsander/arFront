@@ -1,4 +1,3 @@
-from sys import api_version
 import pygame
 from time import time
 
@@ -143,8 +142,8 @@ class App:
         self.cor_bordas_bt = tema['cor_bordas_bt'],
         self.bt_radius = tema['bt_radius']
     
-    def novoSquare(self, lugar=[0,0], refer='nl', cor=None, tamanho=[0.05,0.05], active=True, command=None, radius=None, bordas=0, corBordas=None, end_draw=False):
-        
+    def novoSquare(self, lugar=[0,0], refer='nl', cor=None, tamanho=[0.05,0.05], active=True, command=None, 
+    radius=None, bordas=0, corBordas=None, end_draw=False):
         if not cor: cor = self.cor_bt
         if not radius: radius = self.bt_radius
 
@@ -152,8 +151,9 @@ class App:
         self.listSquares.append(square)
         return square
 
-    def novoBotao(self, lugar:list=[0,0], refer:str='nl', cor:tuple=None , tamanho:list=[0.1,0.055], active:bool=True, command=None, string:str='Novo botão', corTexto:tuple=None, tamanhoTexto:int=None, fonteTexto:str=None, radius:int=None, bordas:int=0, corBordas:tuple=None, end_draw:bool=False):
-
+    def novoBotao(self, lugar:list=[0,0], refer:str='nl', cor:tuple=None , tamanho:list=[0.1,0.055], 
+    active:bool=True, command=None, string:str='Novo botão', corTexto:tuple=None, tamanhoTexto:int=None, 
+    fonteTexto:str=None, radius:int=None, bordas:int=0, corBordas:tuple=None, end_draw:bool=False):
         if not cor: cor = self.cor_bt
         if not corTexto: corTexto = self.cor_texto_bt
         if not tamanhoTexto: tamanhoTexto = 15
@@ -170,14 +170,16 @@ class App:
         self.listMenus.append(menu)
         return menu
     
-    def novoTexto(self, lugar=[0,0], refer='nl', cor=None, tamanho=15, active=True, command=None, string="Novo texto", fonte=None, end_draw=False):
+    def novoTexto(self, lugar=[0,0], refer='nl', cor=None, tamanho=15, active=True, command=None, string="Novo texto", 
+    fonte=None, end_draw=False):
         if not cor: cor = self.cor_texto
         if not fonte: fonte = "ARIAL"
         texto = Texto(lugar, refer, cor, tamanho, active, command, string, fonte, end_draw)
         self.listTextos.append(texto)
         return texto
     
-    def drawSquare(self, cor:tuple=(255,255,255), lugar:list=[0,0], refer="nl", tamanho:list=[40,40], radius:int=0, bordas:int=0, corBordas:tuple=None, end_draw:bool=False):
+    def drawSquare(self, cor:tuple=(255,255,255), lugar:list=[0,0], refer="nl", tamanho:list=[40,40], radius:int=0, 
+    bordas:int=0, corBordas:tuple=None, end_draw:bool=False):
         pos = -1
         if end_draw: pos = 0
         if (not corBordas) and (bordas > 0):
@@ -186,12 +188,10 @@ class App:
         tamanho = get_px(tamanho, self.screen.get_size())
         lugar = get_px(lugar, self.screen.get_size())
         lugar = refer_adjust(lugar, tamanho, refer)
-        
 
         self.draws.insert(pos, ("square", cor, lugar, tamanho, radius, bordas, corBordas))
     
     def drawText(self, string="New text", cor=(0,0,0), lugar=[0,0], refer="nl", tamanho=15, fonte="ARIAL", end_draw=False):
-
         tamanho_surface = get_size_surfice(string, fonte, tamanho)
 
         lugar = get_px(lugar, self.screen.get_size())
@@ -213,7 +213,6 @@ class App:
             
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.mouse.lugar = pygame.mouse.get_pos()
-                
                 for botao in self.listBotoes:
                     if has_colision(botao.getArea(self.screen.get_size()), self.mouse.getArea(self.screen.get_size())):
                         try:
@@ -248,22 +247,13 @@ class App:
                 self.drawSquare(cor=botao.cor, lugar=botao.lugar, refer=botao.refer, tamanho=botao.tamanho, radius=botao.radius, bordas=botao.bordas, corBordas=botao.corBordas, end_draw=botao.end_draw)
                 self.drawText(botao.string, cor=botao.corTexto, lugar=lugar_texto, tamanho=botao.tamanhoTexto, fonte=botao.fonteTexto, refer='c')
         
-        for menu in self.listMenus:
-            if menu.active:
-                if menu.aberto:
-                    self.drawSquare(menu.cor, menu.lugar, menu.tamanho, bordas=1)
-        
         #Adiciona textos à lista de escrita
         for texto in self.listTextos:
             if texto.active:
-                
                 self.drawText(texto.string, texto.cor, texto.lugar, texto.refer, texto.tamanho, texto.fonte)
         
         #Outros updates
         self.txFps.string = f'FPS: {self.FPS}'
-        
-        if self.FPS:
-            pass
         
         #Desenha formas na tela:
         if not pause:
@@ -364,7 +354,6 @@ class Menu(Square):
 class Texto(object):
     def __init__(self, lugar, refer, cor, tamanho, active, command, string, fonte, end_draw):
         super().__init__(lugar, refer, cor, tamanho, active, command, end_draw)
-
         self.string = string
         self.fonte = fonte
 
@@ -381,13 +370,14 @@ if __name__ == '__main__':
     def funcaoBotao():
         print('Botão clicado.')
 
-    bt1 = arApp.novoBotao()
-    bt1.tamanho = [0.3, 0.2]
-    bt1.lugar = [0.5, 0.5]
-    bt1.command = funcaoBotao
-    bt1.refer = 'c'
-    bt1.radius = 6
-
+    bt1 = arApp.novoBotao(
+        tamanho = [0.3, 0.2],
+        lugar = [0.5, 0.5],
+        command = funcaoBotao,
+        refer = 'c',
+        radius = 6
+    )
+    
     def sair():
         return 'finish'
 
@@ -424,9 +414,6 @@ if __name__ == '__main__':
 
     running = True
     while running:
-
-        arApp.drawSquare(lugar=[20, 200])
-
         txMouse.string = str(pygame.mouse.get_pos())
         
         saida = arApp.update()
