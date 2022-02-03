@@ -101,6 +101,7 @@ class App:
         self.listMenus = []
         self.listTextos = []
         self.listSquares = []
+        self.listLists = []
 
         #Definições-------
         if self.FPS_rate == None:
@@ -169,6 +170,14 @@ class App:
         self.listTextos.append(texto)
         return texto
     
+    def novoList(self, lugar=[0,0], refer='nl', cor=None, corTexto=None, tamanho=[0.05,0.05], tamanhoTexto=[15,30], padding=[1,1], active=True, command=None, 
+    radius=None, bordas=0, corBordas=None, content=[], draw_coluns=True, end_draw=False):
+        if not corTexto: corTexto = self.cor_texto
+        lista = List(lugar, refer, cor, corTexto, tamanho, tamanhoTexto, padding, active, command, radius, bordas, 
+        corBordas, content, draw_coluns, end_draw)
+        self.listLists.append(lista)
+        return lista
+    
     def drawSquare(self, cor:tuple=(255,255,255), lugar:list=[0,0], refer="nl", tamanho:list=[40,40], radius:int=0, 
     bordas:int=0, corBordas:tuple=None, end_draw:bool=False):
         pos = -1
@@ -181,6 +190,8 @@ class App:
         lugar = refer_adjust(lugar, tamanho, refer)
 
         self.draws.insert(pos, ("square", cor, lugar, tamanho, radius, bordas, corBordas))
+
+        return lugar
     
     def drawText(self, string="New text", cor=(0,0,0), lugar=[0,0], refer="nl", tamanho=15, fonte="ARIAL", end_draw=False):
         tamanho_surface = get_size_surfice(string, fonte, tamanho)
@@ -189,6 +200,8 @@ class App:
         lugar = refer_adjust(lugar, tamanho_surface, refer)
 
         self.draws.append(("text", string, cor, lugar, tamanho, fonte))
+
+        return lugar
     
     def drawCircle(self, cor=(255,255,255), lugar=[0,0], tamanho=10, end_draw=False):
         self.draws.append(("circle", cor, lugar, tamanho))
@@ -238,6 +251,29 @@ class App:
                 self.drawSquare(cor=botao.cor, lugar=botao.lugar, refer=botao.refer, tamanho=botao.tamanho, radius=botao.radius, bordas=botao.bordas, corBordas=botao.corBordas, end_draw=botao.end_draw)
                 self.drawText(botao.string, cor=botao.corTexto, lugar=lugar_texto, tamanho=botao.tamanhoTexto, fonte=botao.fonteTexto, refer='c')
         
+        #Adiciona lists à lista de escrita
+        for lista in self.listLists:
+            if lista.active:
+                lugar_square = self.drawSquare(lista.cor, lista.lugar, lista.refer, lista.tamanho, lista.radius, lista.bordas, lista.corBordas)
+                content = list(lista.content.items())
+                for i in range(len(content)):
+                    tx_lugar = [lugar_square[0]+(i*lista.tamanhoTexto[0])+lista.padding[0], lugar_square[1]+lista.padding[1]]
+                    column = content[i][0]
+                    itens = content[i][1]
+                    
+                    self.drawText(string=column, cor=lista.corTexto, lugar=tx_lugar, tamanho=lista.tamanhoTexto[1])
+
+                    if lista.draw_coluns:
+                        #Desenha linha horizontal
+                        ln_lugar = [lugar_square[0]+lista.padding[0], lugar_square[1]+lista.padding[1]+(lista.tamanhoTexto[1]) - 1]                
+                        ponto1 = ln_lugar
+                        ponto2 = [ponto1[0]+lista.tamanho[0]-(2*lista.padding[0]), ponto1[1]]
+                        self.drawLine(ponto1, ponto2, cor=(0,0,0))
+                    
+                    for y in range(len(itens)):
+                        tx_lugar = [lugar_square[0]+(i*lista.tamanhoTexto[0])+lista.padding[0], lugar_square[1]+(lista.tamanhoTexto[1]*(y+1))+lista.padding[1]]
+                        self.drawText(string=itens[y], cor=lista.corTexto, lugar=tx_lugar, tamanho=lista.tamanhoTexto[1])
+
         #Adiciona textos à lista de escrita
         for texto in self.listTextos:
             if texto.active:
@@ -330,7 +366,8 @@ class Square(object):
         ]
 
 class Botao(Square):
-    def __init__(self, lugar, refer, cor, tamanho, active, command, string, corTexto, tamanhoTexto, fonteTexto, radius, bordas, corBordas, end_draw):
+    def __init__(self, lugar, refer, cor, tamanho, active, command, string, corTexto, tamanhoTexto, fonteTexto, 
+    radius, bordas, corBordas, end_draw):
         super().__init__(lugar, refer, cor, tamanho, active, command, radius, bordas, corBordas, end_draw)
         self.string = string
         self.corTexto = corTexto
@@ -348,13 +385,23 @@ class Texto(object):
         self.string = string
         self.fonte = fonte
 
+class List(Square):
+    def __init__(self, lugar, refer, cor, corTexto, tamanho, tamanhoTexto, padding, active, command, radius, 
+    bordas, corBordas, content, draw_coluns, end_draw):
+        super().__init__(lugar, refer, cor, tamanho, active, command, radius, bordas, corBordas, end_draw)
+        self.content = content
+        self.corTexto = corTexto
+        self.tamanhoTexto = tamanhoTexto
+        self.padding = padding
+        self.draw_coluns = draw_coluns
+
 class Mouse(Square):
     def __init__(self, areaDeclique=[2, 2], refer='nl'):
         self.tamanho = areaDeclique
         self.refer = refer
 
 if __name__ == '__main__':
-    arApp = App(tema=hackingBlack)
+    arApp = App(tema=tema_padrao)
 
     arApp.txFps.active = True
 
@@ -401,6 +448,19 @@ if __name__ == '__main__':
         refer='c',
         tamanho=60,
         string='arFront'
+    )
+
+    lista_teste = arApp.novoList(
+        lugar=[300,100],
+        tamanho=[250, 120],
+        padding=[5, 5],
+        cor=(-1,0,0),
+        content={
+            'Nomes':('pessoa1', 'pessoa2', 'pessoa3', 'pessoa4'),
+            'Idades':('15', '16')
+        },
+        draw_coluns=False,
+        tamanhoTexto=[100, 15]
     )
 
     running = True
